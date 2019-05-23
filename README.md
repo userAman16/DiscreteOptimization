@@ -1,4 +1,2 @@
 # DiscreteOptimization
-Discrete Optimization Techniques
-
-01 Knapsack Algorithm
+Discrete Optimization Techniques and Algorithms
