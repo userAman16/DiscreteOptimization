@@ -167,7 +167,16 @@ int graphColoring(std::string fileName)
 	int result = colorGraph(tempNodes, graph, indices);
 	/*group nodes by color 2d vector of color and nodes in them*/
 	/*sort each vector of nodes by their degree*/
-	for (int x = 0; x < 3000; x++)
+	int iterations = 0;
+	if (nodeCount > 501)
+	{
+		iterations = 100;
+	}
+	else
+	{
+		iterations = 5000;
+	}
+	for (int x = 0; x < iterations; x++)
 	{
 		
 		std::vector<std::vector<Node>> colorChain;
