@@ -1,0 +1,8 @@
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+csv = request.files[form.raw_csv.name]
+                    csv.save(here + '/ raw.csv')
+
+<form method="post" action="" enctype="multipart/form-data">
+
+<input class="form-control" id=" raw_csv" name=" raw_csv" required="" type="file">
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
