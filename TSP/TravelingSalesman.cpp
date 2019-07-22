@@ -170,7 +170,15 @@ void Kopt(std::vector<std::pair<long double, long double>> &nodes, std::vector<i
 			e = x + 1;
 		}
 	}
-
+	int xx = indices.size() - 1;
+	int x = 0;
+	long double temp = calcDistance(nodes[indices[x]].first, nodes[indices[x]].second, nodes[indices[(xx)]].first, nodes[indices[(xx)]].second);
+	if (maxDis < temp)
+	{
+		maxDis = temp;
+		s = xx;
+		e = x;
+	}
 	nextS = s; // if swaps swap s then check what is new s aka start
 
 	//find adjacent nodes to e aka end
@@ -315,7 +323,7 @@ int TSP(std::string fileName)
 	std::vector<int> bestIndices = visited;
 	long double bestDis = totalDistance(nodes, bestIndices);
 	std::vector<std::string> configurations; //store the generated configurations we do not want to repeat
-	for (int iter = 0; iter < 100; iter++) 
+	for (int iter = 0; iter < 10; iter++) 
 	{
 		Kopt(nodes, bestIndices, bestDis, configurations);
 	}
