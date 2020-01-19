@@ -70,4 +70,17 @@ kopt is my local search
 i need a global heuristic that does not let kopt to stuck in local minima
 
 ####################################################
+start with initial greedy solution
+then do kopt on it whatever we get set it as bestindices
+
+then iterate for 100 times,
+start with a randomly generated indices,
+do kopt on it and also check if this configuration is already present if present then ignore moving to that state.
+
+
+kopt should do a local search guided towards local minima,
+
+randomly generated incides should start from random position and then kopt should go towards minima 
+
+may be we could find a global minima.
 
