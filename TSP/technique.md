@@ -91,3 +91,8 @@ I should run kopt in sandbox i.e run kopt individualy and test if it is actually
 start with randomly generated indices and then apply kopt on it.
 #######################################################
 distance
+
+apply kopt then get the configuration
+apply kopt again on above got configuration but also pass list of already seen configurations so that we do not 
+do kopt on already seen configuration note(joined edges is part of current kopt loop only and is not shared between different kopts(
+I may have to think about this that if i can share joined edges between different kopts!!))
