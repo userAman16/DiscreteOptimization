@@ -84,3 +84,10 @@ randomly generated incides should start from random position and then kopt shoul
 
 may be we could find a global minima.
 
+#####################################################
+kopt should do local search that is making objective function or total distance shorten,
+I should run kopt in sandbox i.e run kopt individualy and test if it is actually optimizing the objective function aka reducing the total distance if it is infact reducing the total distance that we are reaching a local minima.
+
+start with randomly generated indices and then apply kopt on it.
+#######################################################
+distance
