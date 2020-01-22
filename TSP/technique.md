@@ -96,3 +96,26 @@ apply kopt then get the configuration
 apply kopt again on above got configuration but also pass list of already seen configurations so that we do not 
 do kopt on already seen configuration note(joined edges is part of current kopt loop only and is not shared between different kopts(
 I may have to think about this that if i can share joined edges between different kopts!!))
+
+#############################################################
+
+first generate a greedy solution( store this configuration in tabu list )
+set best to this if this is best
+then do kopt on it one time ( store what ever configuration we get in tabu list)
+set best to this if this is best
+
+now iterate for 100 times
+    generate a random configuration(if this already seen configuration generate another random)
+    set best to this if it is best
+    store this in curr
+    for 10
+        do kopt on (curr)
+        if curr already in tabulist
+          break
+        else
+          set best to this if it is best
+        again do kopt on curr
+        
+Note: to kopt pass all the configurations,
+inside kopt when doing kopt if if we see already configuration ignore it by ignoring n.
+and rest all add to configuration list and set best to this if this is best
