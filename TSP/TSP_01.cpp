@@ -76,7 +76,7 @@ bool NotRepeatedEdgeToBeBrokenJoined(std::vector<std::pair<int, int>> &joined_ed
 	x1 = indices[n];
 	temp = (n == 0) ? (indices.size() - 1) : (n - 1);
 	x2 = indices[temp];
-
+	/*
 	for (int i = 0; i < joined_edges.size(); i++)
 	{
 		int y1 = joined_edges[i].first;
@@ -86,7 +86,7 @@ bool NotRepeatedEdgeToBeBrokenJoined(std::vector<std::pair<int, int>> &joined_ed
 		}
 
 	}
-
+	*/
 	return true;
 }
 bool notPresent(int i, std::vector<int> &indices, std::vector<int> &nToIgnore)
@@ -108,6 +108,26 @@ int searchNextN(long double currentDistance, std::vector<int> &indices, std::vec
 	for (int i = 0; i < indices.size(); i++)
 	{
 		if (indices[i] != indices[s] && indices[i] != indices[e] && indices[i] != indices[a] && NotRepeatedEdgeToBeBrokenJoined(joined_edges, broken_edges, s, e, i, indices) && notPresent(indices[i], indices, nToIgnore))
+		{
+
+			long double temp = calcDistance(nodes[indices[e]].first, nodes[indices[e]].second, nodes[indices[i]].first, nodes[indices[i]].second);
+			if (minDis > temp)
+			{
+				minDis = temp;
+				n = i;
+			}
+		}
+	}
+	return n;
+}
+
+int searchNextN_SandBox(long double currentDistance, std::vector<int> &indices, std::vector<std::pair<long double, long double>> &nodes, int s, int e, int a, std::vector<std::pair<int, int>> &broken_edges, std::vector<std::pair<int, int>> &joined_edges)
+{
+	int n = -1;
+	long double minDis = currentDistance;
+	for (int i = 0; i < indices.size(); i++)
+	{
+		if (indices[i] != indices[s] && indices[i] != indices[e] && indices[i] != indices[a] && NotRepeatedEdgeToBeBrokenJoined(joined_edges, broken_edges, s, e, i, indices))
 		{
 
 			long double temp = calcDistance(nodes[indices[e]].first, nodes[indices[e]].second, nodes[indices[i]].first, nodes[indices[i]].second);
@@ -322,6 +342,100 @@ void Kopt(std::vector<std::pair<long double, long double>> &nodes, std::vector<i
 	
 }
 
+void Kopt_SandBox(std::vector<std::pair<long double, long double>> &nodes, std::vector<int> &bestIndices, long double &bestDis)
+{
+	std::vector<std::pair<int/*start vertex*/, int/*end vertex*/>> broken_edges;
+	std::vector<std::pair<int, int>> joined_edges;
+	std::vector<int> indices = bestIndices;
+	
+	// above we have got randomly generated indices
+
+	long double maxDis = 0;
+	int s = 0, e = 0, a = 0, nextS = 0;
+	//iterate over the current path and select the longest edge
+	// start with the this edge and do kopt
+	for (int x = 0; x < (indices.size() - 1); x++)
+	{
+		long double temp = calcDistance(nodes[indices[x]].first, nodes[indices[x]].second, nodes[indices[(x + 1)]].first, nodes[indices[(x + 1)]].second);
+		if (maxDis < temp)
+		{
+			maxDis = temp;
+			s = x;
+			e = x + 1;
+		}
+	}
+	int xx = indices.size() - 1;
+	int x = 0;
+	long double temp = calcDistance(nodes[indices[x]].first, nodes[indices[x]].second, nodes[indices[(xx)]].first, nodes[indices[(xx)]].second);
+	if (maxDis < temp)
+	{
+		maxDis = temp;
+		s = xx;
+		e = x;
+	}
+	nextS = s; // if swaps swap s then check what is new s aka start
+
+	//find adjacent nodes to e aka end
+	if ((e + 1) == (indices.size()))
+	{
+		a = 0;
+	}
+	else
+	{
+		a = e + 1;
+	}
+
+	long double currentDistance = calcDistance(nodes[indices[s]].first, nodes[indices[s]].second, nodes[indices[(e)]].first, nodes[indices[(e)]].second);
+	//find the indice whose distance is shortest from the e except s, a
+	//------------------------------------------
+	int n = searchNextN_SandBox(currentDistance, indices, nodes, s, e, a, broken_edges, joined_edges); // here I have to pass the joined_edges and broken_edges meaning don't join edges previously broken and don't break edges previosuly joined.
+	//---------------------------------------------------------
+	int noOfOpt = 0;
+	while (n != -1 && noOfOpt < 10) // meaning there is actually a next n
+	{
+		std::vector<int> tempIndices = indices;
+		generateConfiguration(tempIndices, e, n, s, a, nextS);
+		joined_edges.push_back(std::make_pair(indices[e], indices[n]));
+		joined_edges.push_back(std::make_pair(indices[s], indices[n - 1]));
+		broken_edges.push_back(std::make_pair(indices[s], indices[e]));
+		broken_edges.push_back(std::make_pair(indices[n], indices[n - 1]));
+		//check if this configuration is already present
+		{
+			indices = tempIndices;
+			//check if this is best configuration
+			long double currDis = totalDistance(nodes, indices);
+			if (currDis < bestDis)
+			{
+				bestDis = currDis;
+				bestIndices = indices;
+			}
+
+			// now a is new e so
+			e = a;
+			if (nextS != s)
+			{
+				s = nextS;
+			}
+			//find adjacent nodes to e
+			if ((e + 1) == (indices.size()))
+			{
+				a = 0;
+			}
+			else
+			{
+				a = e + 1;
+			}
+
+			int oldN = (n == (indices.size() - 1)) ? 0 : (n + 1);
+			//nToIgnore.push_back(oldN);
+			currentDistance = calcDistance(nodes[indices[s]].first, nodes[indices[s]].second, nodes[indices[(e)]].first, nodes[indices[(e)]].second);
+			n = searchNextN_SandBox(currentDistance, indices, nodes, s, e, a, broken_edges, joined_edges);
+		}
+		noOfOpt++;
+	}
+
+}
+
 int TSP(std::string fileName)
 {
 	if (fileName.empty())
@@ -417,13 +531,55 @@ int TSP(std::string fileName)
 	return 0;
 }
 
+int TSP_justKopt(std::string fileName)
+{
+	//lets see how randomization performs
+	if (fileName.empty())
+		return 1;
+
+	// read the lines out of the file
+	std::ifstream infile;
+	infile.open("tmp.data", std::ifstream::in);
+
+	int nodeCount;
+	infile >> nodeCount;
+	std::vector<std::pair<long double, long double>> nodes;
+	std::vector<int> indices;
+	//int *items = new int[numItems];
+	//int *weights = new int[numItems];
+	long double x, y = 0;
+	int index = 0;
+	while (infile >> x >> y)
+	{
+		nodes.push_back(std::make_pair(x, y));
+		indices.push_back(index);
+		index++;
+	}
+
+	//lets just take randomly generated indices
+	//we try to move to local minima from this
+
+	std::random_device dev;
+	std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> dist6(0, (nodeCount - 1));
+	int i = 0, xx = dist6(rng);
+	std::vector<int> visited;
+	std::random_shuffle(indices.begin(), indices.end());
+	visited = indices;
+	std::vector<int> bestIndices = visited;
+	long double bestDis = totalDistance(nodes, bestIndices);
+	Kopt_SandBox(nodes, bestIndices, bestDis);
+
+}
+
 int main(int argc, char **argv)
 {
 	try
 	{
 		std::string fileName;
 		fileName = "tmp.data";
-		TSP(fileName);
+		//TSP(fileName);
+		TSP_justKopt(fileName);
 
 	}
 	catch (...)
