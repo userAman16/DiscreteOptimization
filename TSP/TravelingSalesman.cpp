@@ -229,6 +229,7 @@ void Kopt(std::vector<std::pair<long double, long double>> &nodes, std::vector<i
 	for (int x : indices)
 	{
 		tempS.append(std::to_string(x));
+		tempS.append(" ");
 	}
 	configurations.push_back(tempS);
 
@@ -292,6 +293,7 @@ void Kopt(std::vector<std::pair<long double, long double>> &nodes, std::vector<i
 		for (int x : tempIndices)
 		{
 			tempS.append(std::to_string(x));
+			tempS.append(" ");
 		}
 		/*
 		since string is present in circular format 
@@ -505,16 +507,26 @@ int TSP(std::string fileName)
 	std::vector<int> bestIndices = visited;
 	long double bestDis = totalDistance(nodes, bestIndices);
 	std::vector<std::string> configurations; //store the generated configurations we do not want to repeat
-	
-	for (int i = 0; i < 10; i++) {
+	std::vector<int> currBestIndices = bestIndices;
+	long double currBestDis = totalDistance(nodes, currBestIndices);
+	for (int i = 0; i < 100; i++) 
+	{
 		Kopt(nodes, visited, bestIndices, bestDis, configurations);
-		visited = bestIndices;
+		if (bestDis < currBestDis) {
+			visited = bestIndices;
+			currBestIndices = bestIndices;
+			currBestDis = bestDis;
+		}
+		else
+		{
+			break;
+		}
 	}
-	visited = indices; // again set it to do randomness from some where
+	
 	bool noRandomness = false;
 	for (int i = 0; i < 10; i++) 
 	{
-		
+		visited = indices; // again set it to do randomness from some where
 		for (int ii = 0; ii < 100; ii++) 
 		{
 			std::random_shuffle(visited.begin(), visited.end());
@@ -522,6 +534,7 @@ int TSP(std::string fileName)
 			for (int x : visited)
 			{
 				tempS.append(std::to_string(x));
+				tempS.append(" ");
 			}
 			if (configurationAlreadyPresent(configurations, tempS)) {
 				noRandomness = true;
@@ -540,9 +553,19 @@ int TSP(std::string fileName)
 		}
 		if (!noRandomness) 
 		{
-			for (int ii = 0; ii < 10; ii++) {
+			currBestIndices = bestIndices;
+			currBestDis = bestDis;
+			for (int ii = 0; ii < 100; ii++) {
 				Kopt(nodes, visited, bestIndices, bestDis, configurations);
-				visited = bestIndices;
+				if (bestDis < currBestDis) {
+					visited = bestIndices;
+					currBestIndices = bestIndices;
+					currBestDis = bestDis;
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
 		else
